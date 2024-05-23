@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Email Check</title>
+    <link rel="stylesheet" href="/static/style.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.3/css/bulma.min.css">
+</head>
+<body>
+<div class="container box">
+    <h1 class="title">Email Check Result</h1>
+    <p>{{ message }}</p>
+    {% if sources %}
+    <div class="box">
+        <p>Your email was found in the following breaches:</p>
+        <ul>
+            {% for source in sources %}
+            <li>{{ source }}</li>
+            {% endfor %}
+        </ul>
+    </div>
+    {% endif %}
+</div>
+</body>
+</html>
