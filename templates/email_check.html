@@ -9,16 +9,46 @@
 </head>
 <body>
 <div class="container box">
-    <h1 class="title">Email Check Result</h1>
-    <p>{{ message }}</p>
-    {% if sources %}
-    <div class="box">
-        <p>Your email was found in the following breaches:</p>
-        <ul>
-            {% for source in sources %}
-            <li>{{ source }}</li>
-            {% endfor %}
-        </ul>
+    <a class="button is-light" href="/">Back to Home</a>
+    <h1 class="title">Check if Your Email Has Been Pwned</h1>
+    <form method="post" action="/check_email">
+        <div class="field">
+            <label class="label" for="email">Email Address</label>
+            <div class="control">
+                <input class="input" type="email" id="email" name="email" required>
+            </div>
+        </div>
+        <div class="field">
+            <div class="control">
+                <button class="button is-primary" type="submit">Check Email</button>
+            </div>
+        </div>
+    </form>
+
+    {% if message %}
+    <div class="notification is-info">
+        <p>{{ message }}</p>
+        {% if sources %}
+        <div class="box">
+            <p>Your email was found in the following breaches:</p>
+            <table class="table is-striped is-hoverable is-fullwidth">
+                <thead>
+                    <tr>
+                        <th>Source Name</th>
+                        <th>Date</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for source in sources %}
+                    <tr>
+                        <td>{{ source.name }}</td>
+                        <td>{{ source.date }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% endif %}
     </div>
     {% endif %}
 </div>

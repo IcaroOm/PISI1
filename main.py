@@ -1,11 +1,11 @@
-from fastapi import FastAPI, APIRouter, HTTPException, Request
+from fastapi import FastAPI, APIRouter, HTTPException, Request, Form
 from fastapi.responses import HTMLResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 import random
 import string
 import requests
-import json
+
 
 app = FastAPI()
 
@@ -22,6 +22,11 @@ def generate_random_password(length: int) -> str:
 
 
 @router.get("/", response_class=HTMLResponse)
+async def home(request: Request):
+    return templates.TemplateResponse("home.html", {"request": request})
+
+
+@router.get("/random_pass", response_class=HTMLResponse)
 async def index(request: Request):
     initial_length = 16
     initial_password = generate_random_password(initial_length)
@@ -44,7 +49,12 @@ def check_pwned_email(email: str) -> dict:
 
 
 @router.get("/check_email", response_class=HTMLResponse)
-async def check_email(request: Request, email: str):
+async def check_email_get(request: Request):
+    return templates.TemplateResponse("email_check.html", {"request": request})
+
+
+@router.post("/check_email", response_class=HTMLResponse)
+async def check_email_post(request: Request, email: str = Form(...)):
     data = check_pwned_email(email)
     if data['found'] == 0:
         message = 'Your email has not been found in any data breaches.'
