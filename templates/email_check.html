@@ -3,54 +3,39 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Email Check</title>
-    <link rel="stylesheet" href="/static/style.css">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.3/css/bulma.min.css">
+    <title>Check Email</title>
+    <script src="https://unpkg.com/htmx.org@2.0.1"></script>
+    <link href="https://cdn.jsdelivr.net/npm/daisyui@4.12.10/dist/full.min.css" rel="stylesheet" type="text/css" />
+    <script src="https://cdn.tailwindcss.com?plugins=typography"></script>
 </head>
 <body>
-<div class="container box">
-    <a class="button is-light" href="/">Back to Home</a>
-    <h1 class="title">Check if Your Email Has Been Pwned</h1>
-    <form method="post" action="/check_email">
-        <div class="field">
-            <label class="label" for="email">Email Address</label>
-            <div class="control">
-                <input class="input" type="email" id="email" name="email" required>
-            </div>
+<div class="flex flex-row items">
+    <h1 class="text-5xl font-bold my-5 mx-5 relative left-0">Check Email for Breaches</h1>
+    <a class="btn btn-xs sm:btn-sm md:btn-md lg:btn-lg my-4 mx-4 absolute right-0" href="/">Back to Home</a>
+</div>
+<div class="flex flex-col items-center mx-10 md:mx20">
+    <form class="flex flex-col items-center mb-4"
+    hx-post="/check_email"
+    hx-target="#table_sources">
+        <div class="mb-4">
+            <label class="input input-bordered flex items-center gap-2">
+                Email
+                <input class="input grow" type="email" id="email" name="email" required placeholder="placeholder@site.com" />
+            </label>
         </div>
-        <div class="field">
-            <div class="control">
-                <button class="button is-primary" type="submit">Check Email</button>
-            </div>
-        </div>
+        <button class="btn btn-xs sm:btn-sm md:btn-md lg:btn-lg" type="submit">Check Email</button>
     </form>
-
-    {% if message %}
-    <div class="notification is-info">
-        <p>{{ message }}</p>
-        {% if sources %}
-        <div class="box">
-            <p>Your email was found in the following breaches:</p>
-            <table class="table is-striped is-hoverable is-fullwidth">
-                <thead>
-                    <tr>
-                        <th>Source Name</th>
-                        <th>Date</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for source in sources %}
-                    <tr>
-                        <td>{{ source.name }}</td>
-                        <td>{{ source.date }}</td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
-        {% endif %}
-    </div>
-    {% endif %}
+    <table class="table table-zebra table-lg">
+        <thead>
+            <tr>
+                <th>Source</th>
+                <th>Date</th>
+            </tr>
+        </thead>
+        <tbody id="table_sources">
+            {% include 'table_sources.html' %}
+        </tbody>
+    </table>
 </div>
 </body>
 </html>

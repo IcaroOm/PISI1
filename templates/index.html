@@ -11,40 +11,71 @@
 <div class="container box">
     <a class="button is-light" href="/">Back to Home</a>
     <h1 class="title">Random Password Generator</h1>
+
     <div class="field">
-        <label class="label" for="password-length">Password Length: <span id="length-label">{{ length }}</span></label>
+        <label class="label" for="password-length">Password Length</label>
+        <input class="input" type="range" id="password-length" min="1" max="50" value="{{ length }}">
+    </div>
+
+    <button class="button is-primary" id="generate-button">Generate Password</button>
+
+    <div class="notification is-success" id="password-result" style="display: none;">
+        <strong>Generated Password:</strong>
+        <span id="generated-password">{{ password }}</span>
+        <button class="button is-light" onclick="copyPassword()">Copy</button>
+    </div>
+
+    <div class="field" id="password-name-field" style="display: none;">
+        <label class="label" for="password-name">Password Name</label>
         <div class="control">
-            <input type="range" id="password-length" class="slider" min="8" max="32" value="{{ length }}" oninput="updateLength(this.value)">
+            <input class="input" type="text" id="password-name" placeholder="Enter a name to remember this password">
         </div>
     </div>
-    <div class="field">
-        <div class="control">
-            <div class="password-display" id="password-display">{{ password }}</div>
-        </div>
-    </div>
-    <div class="field">
-        <div class="control">
-            <button class="button is-primary" onclick="copyToClipboard()">Copy</button>
-        </div>
-    </div>
+
+    <button class="button is-success" id="save-button" style="display: none;">Save Password</button>
 </div>
 
 <script>
-    function updateLength(value) {
-        fetch(`/generate_password?length=${value}`)
-            .then(response => response.json())
-            .then(data => {
-                document.getElementById('password-display').innerText = data.password;
-                document.getElementById('length-label').innerText = value;
-            });
-    }
+    document.getElementById('generate-button').addEventListener('click', async function() {
+        const length = document.getElementById('password-length').value;
+        const response = await fetch(`/generate_password?length=${length}`);
+        const data = await response.json();
+        const passwordResult = document.getElementById('password-result');
+        document.getElementById('generated-password').textContent = data.password;
+        passwordResult.style.display = 'block';
+        document.getElementById('password-name-field').style.display = 'block';
+        document.getElementById('save-button').style.display = 'block';
+    });
 
-    function copyToClipboard() {
-        const passwordText = document.getElementById('password-display').innerText;
-        navigator.clipboard.writeText(passwordText).then(() => {
+    function copyPassword() {
+        const password = document.getElementById('generated-password').textContent;
+        navigator.clipboard.writeText(password).then(function() {
             alert('Password copied to clipboard!');
         });
     }
+
+    document.getElementById('save-button').addEventListener('click', async function() {
+        const password = document.getElementById('generated-password').textContent;
+        const name = document.getElementById('password-name').value;
+        if (name.trim() === "") {
+            alert("Please enter a name for the password.");
+            return;
+        }
+
+        const response = await fetch('/save_password', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ name, password })
+        });
+
+        if (response.ok) {
+            alert('Password saved successfully!');
+        } else {
+            alert('Failed to save the password.');
+        }
+    });
 </script>
 </body>
 </html>
