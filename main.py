@@ -29,28 +29,30 @@ async def home(request: Request):
 
 @router.get("/random_pass", response_class=HTMLResponse)
 async def index(request: Request):
-    initial_length = 16
-    initial_password = generate_random_password(initial_length)
-    return templates.TemplateResponse("index.html", {"request": request, "length": initial_length, "password": initial_password})
+    return templates.TemplateResponse("index.html", {"request": request})
 
 
-@router.get("/generate_password", response_class=JSONResponse)
-async def generate_password(request: Request, length: int):
+@router.post("/random_pass", response_class=JSONResponse)
+async def generate_password(request: Request, length: int = Form(...), hx_request: Optional[str] = Header(None)):
     if length < 1:
-        raise HTTPException(status_code=400, detail='Length must be greater than zero')
+        return HTMLResponse(status_code=422, content="<h2>Password length must be between 1 and 50</h2>")
     password = generate_random_password(length)
-    return {"password": password}
+    if hx_request:
+        return templates.TemplateResponse("partials/password_value.html", {"request": request, "password": password})
+    else:
+        return templates.TemplateResponse("index.html", {"request": requests})
 
 
-class SavePasswordRequest(BaseModel):
-    name: str
-    password: str
+@router.put("/save_password", response_class=JSONResponse)
+async def save_password(request: Request):
+    form_data = await request.form()
+    print(form_data)
+    password = form_data.get('password')
+    name = form_data.get('name')
 
-
-@router.post("/save_password", response_class=JSONResponse)
-async def save_password(request: SavePasswordRequest):
-    query = passwords.insert().values(password=request.password, length=len(request.password), name=request.name)
+    query = passwords.insert().values(password=password, length=len(password), name=name)
     await database.execute(query)
+
     return {"message": "Password saved successfully"}
 
 
@@ -83,7 +85,7 @@ async def check_email_post(request: Request, email: str = Form(...), hx_request:
         message = f'Your email has been found in {data["found"]} data breaches.'
         sources = data['sources']
     if hx_request:
-        return templates.TemplateResponse("table_sources.html",  {"request": request, "message": message, "sources": sources, "email": email})
+        return templates.TemplateResponse("partials/table_sources.html",  {"request": request, "message": message, "sources": sources, "email": email})
     return templates.TemplateResponse("email_check.html", {"request": request, "message": message, "sources": sources, "email": email})
 
 

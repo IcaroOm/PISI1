@@ -8,13 +8,15 @@
     <link href="https://cdn.jsdelivr.net/npm/daisyui@4.12.10/dist/full.min.css" rel="stylesheet" type="text/css" />
     <script src="https://cdn.tailwindcss.com?plugins=typography"></script>
 </head>
-<body>
-<div class="flex flex-row items">
-    <h1 class="text-5xl font-bold my-5 mx-5 relative left-0">Check Email for Breaches</h1>
-    <a class="btn btn-xs sm:btn-sm md:btn-md lg:btn-lg my-4 mx-4 absolute right-0" href="/">Back to Home</a>
-</div>
+<body class="bg-gray-100 min-h-screen flex flex-col">
+    <div class="bg-gray-800 text-white p-4 flex justify-between items-center">
+        <h1 class="text-5xl font-bold">Check Email for Breaches</h1>
+        <div class="space-x-2">
+            <a class="btn btn-xs sm:btn-sm md:btn-md lg:btn-lg" href="/">Back to Home</a>
+        </div>
+    </div>
 <div class="flex flex-col items-center mx-10 md:mx20">
-    <form class="flex flex-col items-center mb-4"
+    <form class="flex flex-col items-center mb-4 my-5"
     hx-post="/check_email"
     hx-target="#table_sources">
         <div class="mb-4">
@@ -33,7 +35,7 @@
             </tr>
         </thead>
         <tbody id="table_sources">
-            {% include 'table_sources.html' %}
+            {% include 'partials/table_sources.html' %}
         </tbody>
     </table>
 </div>
