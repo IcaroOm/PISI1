@@ -3,6 +3,7 @@ from fastapi.responses import HTMLResponse, JSONResponse
 from fastapi.templating import Jinja2Templates
 from sqlalchemy import select
 from typing import Optional
+import re
 import random
 import string
 import requests
@@ -15,14 +16,48 @@ router = APIRouter()
 templates = Jinja2Templates(directory="templates")
 
 
-def generate_random_password(length: int) -> str:
-    characters = string.ascii_letters + string.digits + string.punctuation
+def generate_random_password(length: int, use_lowercase: bool, use_uppercase: bool, use_digits: bool,
+                             use_special: bool) -> str:
+    characters = ''
+    if use_lowercase:
+        characters += string.ascii_lowercase
+    if use_uppercase:
+        characters += string.ascii_uppercase
+    if use_digits:
+        characters += string.digits
+    if use_special:
+        characters += string.punctuation
+
+    if not characters:
+        characters = string.ascii_letters  # Fallback to letters if no category selected
+
     return ''.join(random.choice(characters) for _ in range(length))
+
+
+def check_password_strength(password: str) -> str:
+    length_ok = len(password) >= 8
+    has_upper = re.search(r'[A-Z]', password)
+    has_lower = re.search(r'[a-z]', password)
+    has_digit = re.search(r'\d', password)
+    has_special = re.search(r'[!@#$%^&*(),.?":{}|<>]', password)
+
+    strength = "Weak"
+    if length_ok and has_upper and has_lower and has_digit and has_special:
+        strength = "Strong"
+    elif length_ok and (has_upper or has_lower) and (has_digit or has_special):
+        strength = "Moderate"
+
+    return strength
 
 
 @router.get("/", response_class=HTMLResponse)
 async def home(request: Request):
     return templates.TemplateResponse("home.html", {"request": request})
+
+
+@router.get("/password_strength", response_class=HTMLResponse)
+async def password_strength(request: Request):
+    return templates.TemplateResponse("password_strength.html", {"request": request})
 
 
 @router.get("/random_pass", response_class=HTMLResponse)
@@ -31,14 +66,32 @@ async def index(request: Request):
 
 
 @router.post("/random_pass", response_class=JSONResponse)
-async def generate_password(request: Request, length: int = Form(...), hx_request: Optional[str] = Header(None)):
+async def generate_password(
+        request: Request,
+        length: int = Form(...),
+        lowercase: bool = Form(False),
+        uppercase: bool = Form(False),
+        nums: bool = Form(False),
+        specialchars: bool = Form(False),
+        hx_request: Optional[str] = Header(None)
+):
     if length < 1:
         return HTMLResponse(status_code=422, content="<h2>Password length must be between 1 and 50</h2>")
-    password = generate_random_password(length)
+
+    password = generate_random_password(length, lowercase, uppercase, nums, specialchars)
+
     if hx_request:
         return templates.TemplateResponse("partials/password_value.html", {"request": request, "password": password})
     else:
-        return templates.TemplateResponse("index.html", {"request": requests})
+        return templates.TemplateResponse("index.html", {"request": request, "password": password})
+
+
+@app.post("/check_password_strength")
+async def check_password(request: Request, password: str = Form(...), hx_request: Optional[str] = Header(None)):
+    strength = check_password_strength(password)
+    if hx_request:
+        return templates.TemplateResponse("partials/strength_pass_result.html", {"request": request, "strength": strength})
+    return JSONResponse(content={"strength": strength})
 
 
 @router.put("/save_password", response_class=JSONResponse)

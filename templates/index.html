@@ -24,9 +24,9 @@
                         hx-post="/random_pass"
                         hx-target="#pass-value"
                         hx-trigger="change, submit"
-                        hx-include="#password-length, #lowercase, #upper-case, #special-chars, #nums"
+                        hx-include="#password-length, #lower-case, #upper-case, #special-chars, #nums"
                         @htmx:afterOnLoad.window="updateHiddenPassword()">
-                    <div class="flex flex-row items-center space-y-9">
+                    <div class="flex flex-row items-center space-y-9 space-x-4">
                         <div class="relative w-full">
                             <input type="range" class="range range-accent w-full mt-6" min="1" max="50" x-model="length" id="password-length" name="length">
                             <div class="absolute mt-2"
@@ -39,50 +39,52 @@
                             <button class="btn btn-outline btn-success btn-xs sm:btn-sm md:btn-md lg:btn-lg" type="submit">Submit</button>
                         </div>
                     </div>
+                    <div class="flex items-center mx-10 md:mx-20 space-x-5">
+                        <div class="form-control">
+                            <label class="cursor-pointer label">
+                                <span class="label-text">Lower Case Chars</span>
+                                <input type="checkbox" checked="checked" class="checkbox checkbox-success mx-3" id="lower-case" name="lowercase"/>
+                            </label>
+                        </div>
+
+                        <div class="form-control">
+                            <label class="cursor-pointer label">
+                                <span class="label-text">Special Chars</span>
+                                <input type="checkbox" checked="checked" class="checkbox checkbox-success mx-3" id="special-chars" name="specialchars"/>
+                            </label>
+                        </div>
+                        <div class="form-control">
+                            <label class="cursor-pointer label">
+                                <span class="label-text">Numbers</span>
+                                <input type="checkbox" checked="checked" class="checkbox checkbox-success mx-3" id="nums" name="nums"/>
+                            </label>
+                        </div>
+                        <div class="form-control">
+                            <label class="cursor-pointer label">
+                                <span class="label-text">CAPSLOCK</span>
+                                <input type="checkbox" checked="checked" class="checkbox checkbox-success mx-3" id="upper-case" name="uppercase"/>
+                            </label>
+                        </div>
+                    </div>
                 </form>
             </div>
-            <div class="flex flex-row mx-10 md:mx-20 space-x-5">
-                <div class="form-control">
-                    <label class="cursor-pointer label">
-                        <span class="label-text">Lower Case Chars</span>
-                        <input type="checkbox" checked="checked" class="checkbox checkbox-success mx-3" id="lower-case"/>
-                    </label>
-                </div>
-
-                <div class="form-control">
-                    <label class="cursor-pointer label">
-                        <span class="label-text">Special Chars</span>
-                        <input type="checkbox" checked="checked" class="checkbox checkbox-success mx-3" id="special-chars"/>
-                    </label>
-                </div>
-                <div class="form-control">
-                    <label class="cursor-pointer label">
-                        <span class="label-text">Numbers</span>
-                        <input type="checkbox" checked="checked" class="checkbox checkbox-success mx-3" id="nums"/>
-                    </label>
-                </div>
-                <div class="form-control">
-                    <label class="cursor-pointer label">
-                        <span class="label-text">CAPSLOCK</span>
-                        <input type="checkbox" checked="checked" class="checkbox checkbox-success mx-3" id="upper-case"/>
-                    </label>
-                </div>
-            </div>
             <div>
-                <div class="flex flex-col items-center mx-10 md:mx20">
+                <div class="flex flex-col items-center mx-10 md:mx-20">
                     <strong>Generated Password:</strong><span id="pass-value" name="password">{{ password }}</span>
                     <button class="btn btn-xs sm:btn-sm md:btn-md lg:btn-lg my-5" onclick="copyToClipboard()">Copy</button>
                 </div>
             </div>
-        <form hx-put="/save_password" hx-include="#password-name, #hidden-password, #password-username, #password-email" hx-swap="none" onsubmit="updateHiddenPassword()" class="w-full">
-            <div class="flex flex-col items-center w-full space-y-4">
-                <input class="input input-bordered w-full px-4 py-2 text-lg" type="text" id="password-name" placeholder="Password Name" name="name">
-                <input type="hidden" id="hidden-password" name="password">
-                <input class="input input-bordered w-full px-4 py-2 text-lg" type="text" id="password-username" placeholder="Username for the Account" name="username">
-                <input class="input input-bordered w-full px-4 py-2 text-lg" type="text" id="password-email" placeholder="Email for the Account" name="email">
-                <button class="btn btn-xs sm:btn-sm md:btn-md lg:btn-lg my-5" type="submit">Save Password</button>
+            <div class="flex flex-row mx-10 md:mx-20 space-x-5">
+                <form hx-put="/save_password" hx-include="#password-name, #hidden-password, #password-username, #password-email" hx-swap="none" onsubmit="updateHiddenPassword()" class="w-full">
+                    <div class="flex flex-col items-center w-full space-y-4">
+                        <input class="input input-bordered w-full px-4 py-2 text-lg" type="text" id="password-name" placeholder="Password Name" name="name">
+                        <input type="hidden" id="hidden-password" name="password">
+                        <input class="input input-bordered w-full px-4 py-2 text-lg" type="text" id="password-username" placeholder="Username for the Account" name="username">
+                        <input class="input input-bordered w-full px-4 py-2 text-lg" type="text" id="password-email" placeholder="Email for the Account" name="email">
+                        <button class="btn btn-xs sm:btn-sm md:btn-md lg:btn-lg my-5" type="submit">Save Password</button>
+                    </div>
+                </form>
             </div>
-        </form>
         </div>
 
         <script>
