@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html data-theme="light">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Login Page</title>
+        <script src="https://unpkg.com/htmx.org@2.0.1"></script>
+        <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+        <script src="https://cdn.tailwindcss.com"></script>
+        <link href="https://cdn.jsdelivr.net/npm/daisyui@4.12.10/dist/full.min.css" rel="stylesheet" type="text/css"/>
+    </head>
+    <body class="bg-gray-100 flex justify-center items-center h-screen">
+        <div class="bg-white shadow-lg rounded-lg p-8 w-full max-w-sm">
+            <h1 class="text-3xl font-bold mb-6 text-center">Login</h1>
+            <form hx-post="/login" hx-target="#login-result" hx-swap="outerHTML" class="space-y-4">
+                <div class="form-control">
+                    <label class="label">
+                        <span class="label-text">Email</span>
+                    </label>
+                    <input type="email" name="email" id="email" required class="input input-bordered w-full" placeholder="Enter your email">
+                </div>
+                <div class="form-control">
+                    <label class="label">
+                        <span class="label-text">Password</span>
+                    </label>
+                    <input type="password" name="password" id="password" required class="input input-bordered w-full" placeholder="Enter your password">
+                </div>
+                <button class="btn btn-primary w-full mt-4" type="submit">Login</button>
+            </form>
+            <div id="login-result"></div>
+            <p class="text-center mt-4">
+                Don't have an account?
+                <a href="/register" class="text-blue-500 hover:underline">Register</a>
+            </p>
+        </div>
+    </body>
+</html>

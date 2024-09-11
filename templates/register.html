@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register</title>
+    <script src="https://unpkg.com/htmx.org@2.0.1"></script>
+    <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/daisyui@4.12.10/dist/full.min.css" rel="stylesheet" type="text/css"/>
+</head>
+<body class="bg-gray-100 flex flex-col justify-center items-center min-h-screen">
+    <div class="bg-white p-8 shadow-lg rounded-lg w-full max-w-md">
+        <h1 class="text-3xl font-bold mb-6 text-center">Register</h1>
+        <form
+            hx-post="/register"
+            hx-target="#register-feedback"
+            hx-swap="innerHTML"
+            class="space-y-4"
+        >
+            <div class="form-control">
+                <label class="label">
+                    <span class="label-text">Email</span>
+                </label>
+                <input type="email" name="email" id="email" class="input input-bordered w-full" required placeholder="Enter your email">
+            </div>
+
+            <div class="form-control">
+                <label class="label">
+                    <span class="label-text">Password</span>
+                </label>
+                <input type="password" name="password" id="password" class="input input-bordered w-full" required placeholder="Enter your password">
+            </div>
+
+            <div class="form-control">
+                <label class="label">
+                    <span class="label-text">Confirm Password</span>
+                </label>
+                <input type="password" name="confirm_password" id="confirm_password" class="input input-bordered w-full" required placeholder="Confirm your password">
+            </div>
+
+            <div class="form-control mt-6">
+                <button type="submit" class="btn btn-primary w-full">Register</button>
+            </div>
+        </form>
+        <div id="register-feedback" class="mt-4 text-center"></div>
+
+        <!-- Link to login page -->
+        <p class="text-center mt-4">
+            Already have an account?
+            <a href="/login" class="text-blue-500 hover:underline">Log in</a>
+        </p>
+    </div>
+</body>
+</html>
