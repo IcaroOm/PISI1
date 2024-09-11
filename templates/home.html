@@ -1,24 +1,25 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Home</title>
-    <script src="https://unpkg.com/htmx.org@2.0.1"></script>
-    <link href="https://cdn.jsdelivr.net/npm/daisyui@4.12.10/dist/full.min.css" rel="stylesheet" type="text/css" />
-    <script src="https://cdn.tailwindcss.com?plugins=typography"></script>
-</head>
-<body class="bg-gray-100 min-h-screen flex flex-col">
-    <div class="bg-gray-800 text-white p-4 flex justify-between items-center">
-        <h1 class="text-3xl font-bold">Welcome</h1>
-        <div class="space-x-2">
-            <a class="btn btn-xs sm:btn-sm md:btn-md lg:btn-lg" href="/random_pass">Random Password Generator</a>
-            <a class="btn btn-xs sm:btn-sm md:btn-md lg:btn-lg" href="/check_email">Check Email for Breaches</a>
-            <a class="btn btn-xs sm:btn-sm md:btn-md lg:btn-lg" href="/stored_passwords">Stored Passwords</a>
+<html data-theme="light">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Home</title>
+        <script src="https://unpkg.com/htmx.org@2.0.1"></script>
+        <link href="https://cdn.jsdelivr.net/npm/daisyui@4.12.10/dist/full.min.css" rel="stylesheet" type="text/css" />
+        <script src="https://cdn.tailwindcss.com"></script>
+        <script src="https://cdn.tailwindcss.com?plugins=typography"></script>
+    </head>
+    <body class="bg-gray-100 min-h-screen flex flex-col">
+        <div class="bg-gray-800 text-white p-4 flex justify-between items-center">
+            <h1 class="text-3xl font-bold">Welcome</h1>
+            <div class="space-x-2">
+                <a class="btn btn-neutral btn-xs sm:btn-sm md:btn-md lg:btn-lg" href="/random_pass">Random Password Generator</a>
+                <a class="btn btn-neutral btn-xs sm:btn-sm md:btn-md lg:btn-lg" href="/check_email">Check Email for Breaches</a>
+                <a class="btn btn-neutral btn-xs sm:btn-sm md:btn-md lg:btn-lg" href="/stored_passwords">Stored Passwords</a>
+            </div>
         </div>
-    </div>
-    <div class="flex-1 bg-gray-200 flex items-center justify-center">
-        <p class="text-lg text-center max-w-lg px-4 py-8">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed et justo turpis. Sed nec urna mauris.</p>
-    </div>
-</body>
+        <div class="flex-1 bg-gray-200 flex items-center justify-center">
+            <p class="text-lg text-center max-w-lg px-4 py-8">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed et justo turpis. Sed nec urna mauris.</p>
+        </div>
+    </body>
 </html>

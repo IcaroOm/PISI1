@@ -13,6 +13,8 @@ passwords = sqlalchemy.Table(
     sqlalchemy.Column("password", sqlalchemy.String, nullable=False),
     sqlalchemy.Column("length", sqlalchemy.Integer, nullable=False),
     sqlalchemy.Column("name", sqlalchemy.String, nullable=False),
+    sqlalchemy.Column("email", sqlalchemy.String,nullable=True),
+    sqlalchemy.Column("username", sqlalchemy.String, nullable=True),
     sqlalchemy.Column("created_at", sqlalchemy.DateTime, server_default=sqlalchemy.func.now()),
 )
 

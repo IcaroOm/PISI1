@@ -1,43 +1,44 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Check Email</title>
-    <script src="https://unpkg.com/htmx.org@2.0.1"></script>
-    <link href="https://cdn.jsdelivr.net/npm/daisyui@4.12.10/dist/full.min.css" rel="stylesheet" type="text/css" />
-    <script src="https://cdn.tailwindcss.com?plugins=typography"></script>
-</head>
-<body class="bg-gray-100 min-h-screen flex flex-col">
-    <div class="bg-gray-800 text-white p-4 flex justify-between items-center">
-        <h1 class="text-5xl font-bold">Check Email for Breaches</h1>
-        <div class="space-x-2">
-            <a class="btn btn-xs sm:btn-sm md:btn-md lg:btn-lg" href="/">Back to Home</a>
+<html data-theme="light">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Check Email</title>
+        <script src="https://unpkg.com/htmx.org@2.0.1"></script>
+        <link href="https://cdn.jsdelivr.net/npm/daisyui@4.12.10/dist/full.min.css" rel="stylesheet" type="text/css"/>
+        <script src="https://cdn.tailwindcss.com"></script>
+        <script src="https://cdn.tailwindcss.com?plugins=typography"></script>
+    </head>
+    <body class="bg-gray-100 min-h-screen flex flex-col">
+        <div class="bg-gray-800 text-white p-4 flex justify-between items-center">
+            <h1 class="text-5xl font-bold">Check Email for Breaches</h1>
+            <div class="space-x-2">
+                <a class="btn btn-xs sm:btn-sm md:btn-md lg:btn-lg" href="/">Back to Home</a>
+            </div>
         </div>
+    <div class="flex flex-col items-center mx-10 md:mx20">
+        <form class="flex flex-col items-center mb-4 my-5"
+        hx-post="/check_email"
+        hx-target="#table_sources">
+            <div class="mb-4">
+                <label class="input input-bordered flex items-center gap-2">
+                    Email
+                    <input class="input grow" type="email" id="email" name="email" required placeholder="placeholder@site.com" />
+                </label>
+            </div>
+            <button class="btn btn-xs sm:btn-sm md:btn-md lg:btn-lg" type="submit">Check Email</button>
+        </form>
+        <table class="table table-zebra table-lg">
+            <thead>
+                <tr>
+                    <th>Source</th>
+                    <th>Date</th>
+                </tr>
+            </thead>
+            <tbody id="table_sources">
+                {% include 'partials/table_sources.html' %}
+            </tbody>
+        </table>
     </div>
-<div class="flex flex-col items-center mx-10 md:mx20">
-    <form class="flex flex-col items-center mb-4 my-5"
-    hx-post="/check_email"
-    hx-target="#table_sources">
-        <div class="mb-4">
-            <label class="input input-bordered flex items-center gap-2">
-                Email
-                <input class="input grow" type="email" id="email" name="email" required placeholder="placeholder@site.com" />
-            </label>
-        </div>
-        <button class="btn btn-xs sm:btn-sm md:btn-md lg:btn-lg" type="submit">Check Email</button>
-    </form>
-    <table class="table table-zebra table-lg">
-        <thead>
-            <tr>
-                <th>Source</th>
-                <th>Date</th>
-            </tr>
-        </thead>
-        <tbody id="table_sources">
-            {% include 'partials/table_sources.html' %}
-        </tbody>
-    </table>
-</div>
-</body>
+    </body>
 </html>

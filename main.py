@@ -1,8 +1,6 @@
 from fastapi import FastAPI, APIRouter, HTTPException, Request, Form, Header
 from fastapi.responses import HTMLResponse, JSONResponse
-from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
-from pydantic import BaseModel
 from sqlalchemy import select
 from typing import Optional
 import random
@@ -49,8 +47,10 @@ async def save_password(request: Request):
     print(form_data)
     password = form_data.get('password')
     name = form_data.get('name')
+    username = form_data.get('username')
+    email = form_data.get('email')
 
-    query = passwords.insert().values(password=password, length=len(password), name=name)
+    query = passwords.insert().values(password=password, length=len(password), name=name, username=username, email=email)
     await database.execute(query)
 
     return {"message": "Password saved successfully"}
