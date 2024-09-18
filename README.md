@@ -10,7 +10,7 @@ Projeto de um site com ferramentas para segurança de dados usando FastAPI e Jin
        
 ## Instalação
 
-Guia para instalação do projeto. Python 3.7+
+Guia para instalação do projeto. Python 3.9+
 
 1. Clone o repo:
 
