@@ -1,5 +1,5 @@
 from fastapi import FastAPI, APIRouter, HTTPException, Request, Form, Header, Depends
-from fastapi.responses import HTMLResponse, JSONResponse
+from fastapi.responses import HTMLResponse, JSONResponse, Response
 from fastapi.templating import Jinja2Templates
 from sqlalchemy import select
 from sqlalchemy.orm import Session
@@ -120,7 +120,7 @@ async def check_password(request: Request, password: str = Form(...), hx_request
 
 
 @router.put("/save_password", response_class=JSONResponse)
-async def save_password(request: Request):
+async def save_password(request: Request, db: Session = Depends(get_db)):
     form_data = await request.form()
     print(form_data)
     password = form_data.get('password')
@@ -128,8 +128,35 @@ async def save_password(request: Request):
     username = form_data.get('username')
     email = form_data.get('email')
 
-    query = passwords.insert().values(password=password, length=len(password), name=name, username=username,
-                                      email=email)
+    user_email = request.cookies.get("user_email")
+
+    if not user_email:
+        raise HTTPException(status_code=403, detail="Not logged in")
+
+    user = await get_user_by_email(db, user_email)
+
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+
+    user_id = user['id']
+
+    name_check_query = passwords.select().where(
+        passwords.c.name == name,
+        passwords.c.user_id == user_id
+    )
+    existing_password = await database.fetch_one(name_check_query)
+
+    if existing_password:
+        raise HTTPException(status_code=400, detail=f"A password with the name '{name}' already exists.")
+
+
+    query = passwords.insert().values(
+        password=password,
+        length=len(password),
+        name=name,
+        username=username,
+        user_id=user['id']
+    )
     await database.execute(query)
 
     return {"message": "Password saved successfully"}
@@ -137,8 +164,14 @@ async def save_password(request: Request):
 
 @router.get("/stored_passwords", response_class=HTMLResponse)
 async def stored_passwords(request: Request):
-    query = select(passwords.c.name, passwords.c.password, passwords.c.length, passwords.c.created_at)
+    user_email = request.cookies.get("user_email")
+
+    if not user_email:
+        raise HTTPException(status_code=403, detail="Not logged in")
+
+    query = passwords.select().where(passwords.c.email == user_email)
     saved_passwords = await database.fetch_all(query)
+
     return templates.TemplateResponse("stored_passwords.html", {"request": request, "passwords": saved_passwords})
 
 
@@ -185,12 +218,14 @@ async def login_get(request: Request):
 @router.post("/login", response_class=HTMLResponse)
 async def login_post(
         request: Request,
+        response: Response,
         email: str = Form(...),
         password: str = Form(...),
-        db: Session = Depends(get_db)
+        db: Session = Depends(get_db),
 ):
     user = await get_user_by_email(db, email)
     if user and verify_password(password, user["hashed_password"]):
+        response.set_cookie(key="user_email", value=email)
         return templates.TemplateResponse("partials/login_success.html", {"request": request, "email": email})
     else:
         return templates.TemplateResponse("partials/login_error.html", {"request": request, "error": "Invalid email or "
