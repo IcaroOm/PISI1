@@ -1,7 +1,13 @@
 # PISI1 Projeto
 
-Projeto com ferramentas basicas para segurança de dados de um usuario comum, como gerador de senha e checagem de vazamento de email.
+Projeto de um site com ferramentas para segurança de dados usando FastAPI e Jinja2.
 
+ - ### Principais bibliotecas:
+     - FastAPI, o framework escolhido para o projeto. Simples, conhecido por ser um framworke lightweight
+     - Pydantic, faz o typecheck para os dados e formularios da aplicação. Como o python não é uma linguagem  fortemente tipada, essa biblioteca ajuda com isso.
+     - SQLAlchemy, biblioteca para o ORM e CRUDE do projeto. permite criar e gerir banco de  dados SQL. SQLite foi o escolhido paro o projeto.
+     - Jinja2, biblioteca que renderiza os templates HTML.
+       
 ## Instalação
 
 Guia para instalação do projeto. Python 3.7+
