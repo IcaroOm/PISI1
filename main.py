@@ -1,9 +1,11 @@
 from fastapi import FastAPI, APIRouter, HTTPException, Request, Form, Header, Depends
-from fastapi.responses import HTMLResponse, JSONResponse, Response
+from fastapi.responses import HTMLResponse, JSONResponse, Response, RedirectResponse
 from fastapi.templating import Jinja2Templates
 from sqlalchemy import select
+from starlette.middleware.sessions import SessionMiddleware
 from sqlalchemy.orm import Session
 from typing import Optional
+import html
 import re
 import random
 import string
@@ -15,6 +17,15 @@ app = FastAPI()
 router = APIRouter()
 
 templates = Jinja2Templates(directory="templates")
+
+app.add_middleware(SessionMiddleware, secret_key="your-secret-key")
+
+
+def verify_password(plain_password, hashed_password):
+    return pwd_context.verify(plain_password, hashed_password)
+
+def get_password_hash(password):
+    return pwd_context.hash(password)
 
 
 def get_db():
@@ -43,24 +54,8 @@ def generate_random_password(length: int, use_lowercase: bool, use_uppercase: bo
     return ''.join(random.choice(characters) for _ in range(length))
 
 
-def check_password_strength(password: str) -> str:
-    length_ok = len(password) >= 8
-    has_upper = re.search(r'[A-Z]', password)
-    has_lower = re.search(r'[a-z]', password)
-    has_digit = re.search(r'\d', password)
-    has_special = re.search(r'[!@#$%^&*(),.?":{}|<>]', password)
-
-    strength = "Weak"
-    if length_ok and has_upper and has_lower and has_digit and has_special:
-        strength = "Strong"
-    elif length_ok and (has_upper or has_lower) and (has_digit or has_special):
-        strength = "Moderate"
-
-    return strength
-
-
-async def get_user_by_email(db: Session, email: str):
-    query = users.select().where(users.c.email == email)
+async def get_user_by_username(db: Session, username: str):
+    query = users.select().where(users.c.username == username)
     return await database.fetch_one(query)
 
 
@@ -70,18 +65,18 @@ async def create_user(db: Session, email: str, password: str):
     await database.execute(query)
 
 
-def verify_password(plain_password, hashed_password):
-    return pwd_context.verify(plain_password, hashed_password)
-
-
 @router.get("/", response_class=HTMLResponse)
 async def home(request: Request):
     return templates.TemplateResponse("home.html", {"request": request})
 
 
-@router.get("/password_strength", response_class=HTMLResponse)
-async def password_strength(request: Request):
-    return templates.TemplateResponse("password_strength.html", {"request": request})
+@router.get("/suggest_password", response_class=JSONResponse)
+async def generate_password(request: Request, hx_request: Optional[str] = Header(None)):
+    password = generate_random_password(12, True, True, True, True)
+    if hx_request:
+        return templates.TemplateResponse("partials/password_suggest_register.html", {"request": request, "password": password})
+    else:
+        return templates.TemplateResponse("register.html", {"request": request, "password": password})
 
 
 @router.get("/random_pass", response_class=HTMLResponse)
@@ -110,15 +105,6 @@ async def generate_password(
         return templates.TemplateResponse("index.html", {"request": request, "password": password})
 
 
-@router.post("/check_password_strength")
-async def check_password(request: Request, password: str = Form(...), hx_request: Optional[str] = Header(None)):
-    strength = check_password_strength(password)
-    if hx_request:
-        return templates.TemplateResponse("partials/strength_pass_result.html",
-                                          {"request": request, "strength": strength})
-    return JSONResponse(content={"strength": strength})
-
-
 @router.put("/save_password", response_class=JSONResponse)
 async def save_password(request: Request, db: Session = Depends(get_db)):
     form_data = await request.form()
@@ -128,12 +114,12 @@ async def save_password(request: Request, db: Session = Depends(get_db)):
     username = form_data.get('username')
     email = form_data.get('email')
 
-    user_email = request.cookies.get("user_email")
+    username = request.session.get("user")
 
-    if not user_email:
+    if not username:
         raise HTTPException(status_code=403, detail="Not logged in")
 
-    user = await get_user_by_email(db, user_email)
+    user = await get_user_by_username(db, username)
 
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
@@ -164,12 +150,12 @@ async def save_password(request: Request, db: Session = Depends(get_db)):
 
 @router.get("/stored_passwords", response_class=HTMLResponse)
 async def stored_passwords(request: Request):
-    user_email = request.cookies.get("user_email")
+    username = request.session.get("user")
 
-    if not user_email:
+    if not username:
         raise HTTPException(status_code=403, detail="Not logged in")
 
-    query = passwords.select().where(passwords.c.email == user_email)
+    query = passwords.select().where(passwords.c.username == username)
     saved_passwords = await database.fetch_all(query)
 
     return templates.TemplateResponse("stored_passwords.html", {"request": request, "passwords": saved_passwords})
@@ -216,41 +202,82 @@ async def login_get(request: Request):
 
 
 @router.post("/login", response_class=HTMLResponse)
-async def login_post(
-        request: Request,
-        response: Response,
-        email: str = Form(...),
-        password: str = Form(...),
-        db: Session = Depends(get_db),
-):
-    user = await get_user_by_email(db, email)
-    if user and verify_password(password, user["hashed_password"]):
-        response.set_cookie(key="user_email", value=email)
-        return templates.TemplateResponse("partials/login_success.html", {"request": request, "email": email})
-    else:
+async def login(request: Request, db: Session = Depends(get_db), email: str = Form(...), password: str = Form(...)):
+    user = db.query(users).filter(users.email == email).first()
+    if not user or not verify_password(password, user.password):
         return templates.TemplateResponse("partials/login_error.html", {"request": request, "error": "Invalid email or "
                                                                                                      "password"})
 
+    request.session["user"] = user.username
+    return RedirectResponse(url="/", status_code=302)
 
+@router.get("/session-check", response_class=HTMLResponse)
+async def session_check(request: Request):
+    if request.session.get("user"):
+        return HTMLResponse("Logged in")
+    else:
+        raise HTTPException(status_code=403, detail="Not logged in")
+
+
+@router.get("/session-status", response_class=HTMLResponse)
+async def session_status(request: Request):
+    if request.session.get("user"):
+        return HTMLResponse("Logged in")
+    else:
+        return HTMLResponse("Not logged in")
+
+
+@router.get("/logout", response_class=HTMLResponse)
+async def logout(request: Request):
+    request.session.pop("user", None)
+    return Response(status_code=204, headers={"HX-Redirect": "/"})
+
+
+# Register page
 @router.get("/register", response_class=HTMLResponse)
-async def register(request: Request):
+async def register_page(request: Request):
     return templates.TemplateResponse("register.html", {"request": request})
 
 
+# Register logic
 @router.post("/register", response_class=HTMLResponse)
-async def register(
-        request: Request,
-        email: str = Form(...),
-        password: str = Form(...),
-        db: Session = Depends(get_db)
-):
-    existing_user = await get_user_by_email(db, email)
-    if existing_user:
-        return templates.TemplateResponse("partials/login_error.html",
-                                          {"request": request, "error": "Email already registered"})
+async def register(request: Request, db: Session = Depends(get_db), username: str = Form(...),
+                   password: str = Form(...), email: str = Form(...)):
+    existing_user = db.query(users).filter(users.c.username == username).first()
+    existing_email = db.query(users).filter(users.c.email == email).first()
+    if existing_user or existing_email:
+        return templates.TemplateResponse("partials/login_error.html", {"request": request, "error": "Username already taken"})
 
-    await create_user(db, email, password)
-    return templates.TemplateResponse("partials/register_success.html", {"request": request, "email": email})
+    hashed_password = get_password_hash(password)
+    stmt = users.insert().values(email=email, username=username, hashed_password=hashed_password)
+
+    db.execute(stmt)
+    db.commit()
+
+    new_user = db.query(users).filter(users.c.username == username).first()
+
+    platform_password = password
+    password_length = len(platform_password)
+    password_name = f"{username}'s Password"
+
+    password_stmt = passwords.insert().values(
+        password=platform_password,
+        length=password_length,
+        name=password_name,
+        email=email,
+        username=username,
+        user_id=new_user.id,
+    )
+    db.execute(password_stmt)
+    db.commit()
+
+    request.session["user"] = new_user.username
+    return Response(status_code=204, headers={"HX-Redirect": "/"})
+
+
+@router.get("/auth_buttons", response_class=HTMLResponse)
+async def auth_buttons(request: Request):
+    return templates.TemplateResponse("partials/auth_buttons.html", {"request": request})
 
 
 app.include_router(router)

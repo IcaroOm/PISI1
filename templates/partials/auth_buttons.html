@@ -1,0 +1,5 @@
+{% if request.session.get('user') %}
+    <button class="btn btn-primary btn-xs sm:btn-sm md:btn-md lg:btn-lg px-4" hx-get="/logout" hx-target="#auth-buttons" hx-swap="none">Logout</button>
+{% else %}
+    <a class="btn btn-primary btn-xs sm:btn-sm md:btn-md lg:btn-lg px-4" href="/login">Login</a>
+{% endif %}
