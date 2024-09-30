@@ -59,6 +59,6 @@ Isto abrirar um localhost em: `http://127.0.0.1:8000`.
 
 
 ## Fluxograma do Projeto
-[Diagrama em branco.pdf](https://github.com/user-attachments/files/17184046/Diagrama.em.branco.pdf)
+![Diagrama em branco-1](https://github.com/user-attachments/assets/6f65e4b8-2823-449d-847b-9d759146e597)
 
 
