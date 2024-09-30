@@ -44,9 +44,15 @@ Isto abrirar um localhost em: `http://127.0.0.1:8000`.
 
 
 # Telas
+### Tela de Senhas vazadas. Usa API externa para checagem. Possui botão para criar uma senha para o serviço em que a senha foi vazada.
 ![hgnfgvbdfghhtrf](https://github.com/user-attachments/assets/fce7cad9-4d28-4de1-ab87-bb36909eb0fa)
-![hfgbvxcvsdgf](https://github.com/user-attachments/assets/601cd0b1-6e1d-4817-9f2b-8f69c2c51f14)
+### Tela de Registro, Possui botao que gera uma senha aleatoria, após o registro a senha do usuario pode ser vista na pagina stored passwords.
+![image](https://github.com/user-attachments/assets/379ce068-0e56-48cb-be9a-c15af6d7c5bb)
+### Pagina de login. Esta salvando sessão. Funcionando tudo corretamente.
 ![ehsgfnsdfgdfg](https://github.com/user-attachments/assets/b1465cdb-66cd-4eda-9c6d-f6966dab251c)
+### Tela de geração de senhas aleatorias. Salva a senha na conta do usuario em sessão
 ![cdkdjfgbdjlhvd](https://github.com/user-attachments/assets/bceaa992-6a6e-4865-98df-9ca2ee96968d)
+### Tela Home, possui também a opção de logout caso ja esteja logado.
 ![Capturar](https://github.com/user-attachments/assets/dea07fb0-735b-4729-be28-7ee7b404ee11)
+### Tela das senhas salvas. Possui também a senha usada para o login na plataforma.
 ![wadsfcsdgregfdsg](https://github.com/user-attachments/assets/3c597b65-fb5d-483d-8504-06921a1da675)
