@@ -56,3 +56,9 @@ Isto abrirar um localhost em: `http://127.0.0.1:8000`.
 ![Capturar](https://github.com/user-attachments/assets/dea07fb0-735b-4729-be28-7ee7b404ee11)
 ### Tela das senhas salvas. Possui também a senha usada para o login na plataforma.
 ![wadsfcsdgregfdsg](https://github.com/user-attachments/assets/3c597b65-fb5d-483d-8504-06921a1da675)
+
+
+## Fluxograma do Projeto
+[Diagrama em branco.pdf](https://github.com/user-attachments/files/17184046/Diagrama.em.branco.pdf)
+
+
